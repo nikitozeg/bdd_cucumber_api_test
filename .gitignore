@@ -1,0 +1,8 @@
+/.idea/
+*.iml
+/target/
+/lib
+/build/
+/.gradle/
+*.conf.groovy
+DatabaseHelper.groovy

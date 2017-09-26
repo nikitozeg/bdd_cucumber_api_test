@@ -1,4 +1,4 @@
-# IQOption (web service test )
+# (web service test )
 
 
 This is the way to test web service using Cucumber and Java.

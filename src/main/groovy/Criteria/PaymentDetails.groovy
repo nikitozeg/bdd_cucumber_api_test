@@ -4,11 +4,11 @@ package Criteria
  */
 class PaymentDetails {
 
-    String externalid
+    String externalId
     String details
 
     private PaymentDetails(Builder builder) {
-        this.externalid = builder.externalid
+        this.externalId = builder.externalId
         this.details = builder.details
 
 
@@ -19,7 +19,7 @@ class PaymentDetails {
     }
 
     static class Builder {
-        String externalid = ""
+        String externalId = ""
         String details = ""
 
         PaymentDetails build() {
@@ -28,7 +28,7 @@ class PaymentDetails {
 
         PaymentDetails.Builder setexternalid(String value) {
             if (value) {
-                externalid = value
+                externalId = value
             }
             this
         }

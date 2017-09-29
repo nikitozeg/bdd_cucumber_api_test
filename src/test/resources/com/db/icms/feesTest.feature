@@ -1,0 +1,86 @@
+Feature: EPA v2/fees test
+
+  Background:
+    And Token service is disconnected
+    And Fees is disconnected
+
+
+  Scenario Outline: Mass payment: Purse --> Card (validate by fullPAN) (single Payment)sdf
+    And Token service is connected
+    And Token recieved for user bizSanction@qa.swiftcom.uk
+    And Fees is connected
+
+    And Add parameters to body request for payment service via "<requestPattern>" pattern by:
+      | fromProvider | fromIdentity | fromCurrency   | fromAmount   | toProvider   | toCurrency   | toAmount   | details | externalId |
+      | eWaLLet      | 000-571041   | <fromCurrency> | <fromAmount> | <toProvider> | <toCurrency> | <toAmount> | 1       | *UUID*     |
+    And Add card identity to body request for payment service via "<requestPattern>" pattern by:
+      | fullPAN    | cardHolder    |
+      | <fullPAN1> | <cardHolder1> |
+
+    * Root object is:
+      | state | dateStarted | dateFinished | payments | id   | self | errorCode       | errorMsgs       |
+      | New   | null        | null         | 1        | null | null | <rooterrorCode> | <rooterrorMsgs> |
+    * Payment object is:
+      | id                                   | to           | from    | externalId | details | metadata | state   | dateStarted | dateFinished | quote | quoteExpireIn | rate | redirectUrl | errorCode   | errorMsgs   |
+      | 00000000-0000-0000-0000-000000000000 | <toProvider> | eWaLLet | *UUID*     | 1       | null     | <state> | null        | null         | null  | null          | null | null        | <errorCode> | <errorMsgs> |
+
+    * From object is:
+      | provider | identity   | amount               | currency       | fee  |
+      | eWaLLet  | 000-571041 | <receivedFromAmount> | <fromCurrency> | null |
+
+    * To object is:
+      | provider     | identity           | amount | currency     | fee  |
+      | <toProvider> | <receivedIdentity> | null   | <toCurrency> | null |
+
+    And Fees Request is executed
+    And Fees results checked
+
+
+
+    Examples: check validation for identity=fullPAN:
+      | fromCurrency | fromAmount | --- | toProvider | toCurrency | fullPAN1   | cardHolder1 | receivedFromAmount | receivedIdentity                      | errorCode | errorMsgs                                                | rooterrorCode | rooterrorMsgs                                                                      | state  | requestPattern |
+      | RUB          | 1000       | --- | card       | RUB        |            |             | 1000.0             | {}                                    | -4        | [Unfortunately this service is temporarily unavailable]  | 19055         | [Mass payment has not been processed completely. Please check transaction results] | Failed | absent         |
+      | RUB          | 1000       | --- | card       | RUB        |            |             | 1000.0             | {cardHolder=null, fullPAN=null}       | -4        | [Unfortunately this service is temporarily unavailable]  | 19055         | [Mass payment has not been processed completely. Please check transaction results] | Failed | null           |
+      | RUB          |            | --- | CARD       | RUB        |            |             | null               | {cardHolder=null, fullPAN=null}       | 53020     | [Only the amount to be sent or received must be entered] | 19055         | [Mass payment has not been processed completely. Please check transaction results] | Failed | null           |
+      | RUB          | 1000       | --- | CARD       | RUB        | invalidPAN |             | 1000.0             | {cardHolder=null, fullPAN=invalidPAN} | 53003     | [Recipient entered incorrectly]                          | 19055         | [Mass payment has not been processed completely. Please check transaction results] | Failed | null           |
+
+  ##    | eWaLLet      | 000-571041   | RUB          | 1000       | --- | card       | usd        |          | 1       |          |             | 1000.0             | {cardHolder=null, fullPAN=null} | 53003     | [Recipient entered incorrectly] | 0         | [] | Failed | null           |
+
+
+
+  Scenario Outline: Mass payment: Purse --> Card (validate from/to objects) (single Payment)
+    And Token service is connected
+    And Token recieved for user bizSanction@qa.swiftcom.uk
+    And Fees is connected
+
+    And Add parameters to body request for payment service via "<requestPattern>" pattern by:
+      | fromProvider   | fromIdentity   | fromCurrency   | fromAmount   | toProvider   | toCurrency   | toAmount   | details   | externalId |
+      | <fromProvider> | <fromIdentity> | <fromCurrency> | <fromAmount> | <toProvider> | <toCurrency> | <toAmount> | <details> | *UUID*     |
+    And Add card identity to body request for payment service via "<requestPattern>" pattern by:
+      | fullPAN | cardHolder |
+      |         |            |
+
+    * Root object is:
+      | state | dateStarted | dateFinished | payments  | id   | self | errorCode       | errorMsgs       |
+      | New   | null        | null         | <details> | null | null | <rooterrorCode> | <rooterrorMsgs> |
+    * Payment object is:
+      | id                                   | to           | from           | externalId | details   | metadata | state   | dateStarted | dateFinished | quote | quoteExpireIn | rate | redirectUrl | errorCode   | errorMsgs   |
+      | 00000000-0000-0000-0000-000000000000 | <toProvider> | <fromProvider> | *UUID*     | <details> | null     | <state> | null        | null         | null  | null          | null | null        | <errorCode> | <errorMsgs> |
+
+    * From object is:
+      | provider       | identity       | amount               | currency       | fee  |
+      | <fromProvider> | <fromIdentity> | <receivedFromAmount> | <fromCurrency> | null |
+
+    * To object is:
+      | provider     | identity                        | amount | currency     | fee  |
+      | <toProvider> | {cardHolder=null, fullPAN=null} | null   | <toCurrency> | null |
+
+    And Fees Request is executed
+    And Fees results checked
+
+
+
+    Examples: check validation for From/To:
+      | fromProvider | fromIdentity | fromCurrency | fromAmount | --- | toProvider | toCurrency | toAmount | details | receivedFromAmount | errorCode | errorMsgs                                 | rooterrorCode | rooterrorMsgs                                                                      | state  | requestPattern |
+      | eWaLLet      | 000-571041   | null         | 1000       | --- | card       | null       |          | 1       | 1000.0             | 53008     | [Currency to be sent entered incorrectly] | 19055         | [Mass payment has not been processed completely. Please check transaction results] | Failed | null           |
+      | eWaLLet      | 000-571041   |              | 1000       | --- | card       |            |          | 1       | 1000.0             | 53008     | [Currency to be sent entered incorrectly] | 19055         | [Mass payment has not been processed completely. Please check transaction results] | Failed | null           |

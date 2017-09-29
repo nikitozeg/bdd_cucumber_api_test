@@ -91,4 +91,21 @@ class DataTableUtils {
 
     }
 
+    static DataTable replaceValueInColumn(DataTable table, String columnName, List newValue) {
+        def List<Map<String, String>> list = []
+        def map = [:]
+        table.asMaps(String, String).eachWithIndex { it, int indexRow ->
+            it.each { it2 ->
+                if (it2.key.toString().equals(columnName)) {
+                    map.put(it2.key, newValue[indexRow].toString())
+                } else {
+                    map.put(it2.key, it2.value)
+                }
+            }
+            list.add(map)
+            map=[:]
+        }
+        def newtable = DataTable.create(list)
+        newtable
+    }
 }

@@ -1,4 +1,4 @@
-package iqoption
+package com.db.icms2
 
 import cucumber.api.DataTable
 
@@ -12,7 +12,6 @@ this.metaClass.mixin(cucumber.api.groovy.EN)
 
 
 And(~'^DB record in (InvoicePositions|TPurseTransactions|LimitRecords|TExternalTransactions) table for the record #(\\d+)') { String SQLTableName, Integer index, DataTable table ->
-    //paymentIDs = ["6044e8fd-71bc-4c8a-80e5-074b1b2d2a5c", "f89f2376-1f18-4bce-9f18-e2debbca9a98"]
     def receivedObjects
     switch (SQLTableName) {
         case "InvoicePositions":

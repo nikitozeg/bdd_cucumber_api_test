@@ -15,8 +15,8 @@ class TokenServiceAdapter extends HttpsServiceAdapter {
         super((String) Configuration.getConf().http4)
     }
 
-    def List<Map<String, String>> getToken(String userName, String jsonContent) {
-        return callServiceAsPOSTBasic(userName, "", jsonContent, new ResponseParser())
+    def List<Map<String, String>> getToken(String userName) {
+        return callServiceAsPOSTBasic(userName, "", new ResponseParser())
     }
 
 }

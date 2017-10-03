@@ -42,7 +42,10 @@ class PaymentFromTo {
 
         PaymentFromTo.Builder setAmount(String value) {
             if (value) {
-                amount = value
+                if (value.equalsIgnoreCase("null"))
+                    amount = null
+                else
+                    amount = value
             }
             this
         }

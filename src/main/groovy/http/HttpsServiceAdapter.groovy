@@ -190,7 +190,7 @@ public class HttpsServiceAdapter {
         return execute;
     }
 
-    public List<Map<String, String>> callServiceAsPOSTBasic(String userName, String servicePath, String requestBody,
+    public List<Map<String, String>> callServiceAsPOSTBasic(String userName, String servicePath,
                                                             final ResponseParser responseParser) {
         String request
 
@@ -204,7 +204,7 @@ public class HttpsServiceAdapter {
         httpPost.setEntity(new UrlEncodedFormEntity(params));
 
         log.info("URL: " + url + servicePath);
-        log.info("Executing request " + requestBody);
+        log.info("Executing TOKEN request");
         // log.info("Executing request " + httpPost.getRequestLine());
         // Create a custom response handler
         ResponseHandler responseHandler = new ResponseHandler() {
@@ -226,7 +226,6 @@ public class HttpsServiceAdapter {
                 } else {
                     HttpEntity entity = response.getEntity();
                     EntityUtils.consume(entity);
-                    request = requestBody + "\r\n"
                     throw new ClientProtocolException("Unexpected response status: " + response.getStatusLine());
                 }
             }
@@ -234,7 +233,6 @@ public class HttpsServiceAdapter {
         };
 
         def execute = httpclient.execute(httpPost, responseHandler)
-        request = requestBody + "\r\n"
         return execute;
     }
 

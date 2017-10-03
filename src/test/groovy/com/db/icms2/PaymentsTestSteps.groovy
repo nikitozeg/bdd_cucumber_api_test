@@ -75,7 +75,7 @@ And(~'^Token service is disconnected$') { ->
 }
 
 And(~'^Token recieved for user ([^"]*)$') { String userName ->
-    def tokenResponse = TokenServiceAdapter.instance.getToken(userName, jsonBuffer.toString())
+    def tokenResponse = TokenServiceAdapter.instance.getToken(userName)
     token = tokenResponse.access_token[0]
     System.setProperty("token", token.toString());
     token
@@ -302,7 +302,7 @@ And(~'^Add parameters to body request for payment service via "(null|empty|absen
     }*/
 
 
-    println(jsonBuffer)
+  //  println(jsonBuffer)
 }
 
 
